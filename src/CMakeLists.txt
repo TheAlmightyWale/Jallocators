@@ -1,0 +1,5 @@
+set(LIBRARY_NAME "Jallocators")
+
+add_library(${LIBRARY_NAME} "IntrusiveStack.hpp" )
+
+set_target_properties(${LIBRARY_NAME} PROPERTIES CXX_STANDARD 20 LINKER_LANGUAGE CXX)
