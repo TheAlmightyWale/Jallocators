@@ -30,9 +30,9 @@ namespace Jalloc
     {
     public:
         IntrusiveStack(uint32_t sizeBytes)
-            : maxSize(sizeBytes)
+            : maxSizeBytes(sizeBytes)
         {
-            base = static_cast<uint8_t *>(std::malloc(maxSize));
+            base = static_cast<uint8_t*>(std::malloc(maxSizeBytes));
             head = base;
         }
 
@@ -43,17 +43,18 @@ namespace Jalloc
 
         uint32_t AvailableSpace()
         {
-            return static_cast<uint32_t>(maxSize - (head - base));
+            return static_cast<uint32_t>(maxSizeBytes - (head - base));
         }
 
         template <typename T, typename... Args>
-        [[nodiscard]] T *Alloc(Args &&...args) noexcept
+        [[nodiscard]] T* Alloc(Args &&...args) noexcept
         {
             static_assert(sizeof(T) < std::numeric_limits<uint16_t>::max(), "Can't allocate an individual object larger then 65,535 bytes");
             // optional logging
 
             // Do size check
-            assert((head + sizeof(T) + sizeof(Detail::BookKeeping<T>)) - base < maxSize);
+            uint32_t attemptedAllocation = sizeof(T) + sizeof(Detail::BookKeeping<T>);
+            assert((head + attemptedAllocation) - base < maxSizeBytes);
             T *obj = new (head) T(std::forward<Args>(args)...);
             head += sizeof(T);
 
@@ -91,8 +92,8 @@ namespace Jalloc
         }
 
     private:
-        uint32_t maxSize = 0;
-        uint8_t *base = nullptr;
-        uint8_t *head = nullptr;
+        uint32_t maxSizeBytes = 0;
+        uint8_t* base = nullptr;
+        uint8_t* head = nullptr;
     };
 }
