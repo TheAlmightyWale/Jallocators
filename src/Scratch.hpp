@@ -7,7 +7,7 @@ namespace Jalloc
     class Scratch
     {
     public:
-        Scratch(uint32_t size) : m_stack(size)
+        Scratch(uint32_t size) : stack_(size)
         {}
 
         ~Scratch() = default;
@@ -15,19 +15,19 @@ namespace Jalloc
         template <typename T, typename... Args>
         [[nodiscard]] T* Alloc(Args &&...args) noexcept
         {
-            return m_stack.Alloc<T,Args...>(std::forward(args)...);
+            return stack_.Alloc<T,Args...>(std::forward(args)...);
         }
 
         uint32_t AvailableSpace()
         {
-            return m_stack.AvailableSpace();
+            return stack_.AvailableSpace();
         }
 
         void Reset(){
-            m_stack.Reset();
+            stack_.Reset();
         }
 
     private:
-        IntrusiveStack m_stack;
+        IntrusiveStack stack_;
     };
 }

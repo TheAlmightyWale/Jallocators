@@ -30,20 +30,20 @@ namespace Jalloc
     {
     public:
         IntrusiveStack(uint32_t sizeBytes)
-            : maxSizeBytes(sizeBytes)
+            : maxSizeBytes_(sizeBytes)
         {
-            base = static_cast<uint8_t*>(std::malloc(maxSizeBytes));
-            head = base;
+            base_ = static_cast<uint8_t*>(std::malloc(maxSizeBytes_));
+            head_ = base_;
         }
 
         ~IntrusiveStack()
         {
-            std::free(base);
+            std::free(base_);
         }
 
         uint32_t AvailableSpace()
         {
-            return static_cast<uint32_t>(maxSizeBytes - (head - base));
+            return static_cast<uint32_t>(maxSizeBytes_ - (head_ - base_));
         }
 
         template <typename T, typename... Args>
@@ -54,14 +54,14 @@ namespace Jalloc
 
             // Do size check
             uint32_t attemptedAllocation = sizeof(T) + sizeof(Detail::BookKeeping<T>);
-            assert((head + attemptedAllocation) - base < maxSizeBytes);
-            T *obj = new (head) T(std::forward<Args>(args)...);
-            head += sizeof(T);
+            assert((head_ + attemptedAllocation) - base_ < maxSizeBytes_);
+            T *obj = new (head_) T(std::forward<Args>(args)...);
+            head_ += sizeof(T);
 
             // create bookkeeping
-            new(head) Detail::BookKeeping<T>();
+            new(head_) Detail::BookKeeping<T>();
             // Attempt to construct object
-            head += sizeof(Detail::BookKeeping<T>);
+            head_ += sizeof(Detail::BookKeeping<T>);
 
             // return pointer
             return obj;
@@ -69,9 +69,9 @@ namespace Jalloc
 
         void Reset() noexcept
         {
-            while (head != base)
+            while (head_ != base_)
             {
-                assert(head > base);
+                assert(head_ > base_);
                 Delete();
             }
         }
@@ -81,19 +81,19 @@ namespace Jalloc
         void Delete() noexcept
         {
             // grab bookkeeper
-            uint8_t *bkStart = head - sizeof(Detail::BookKeeping<void>);
+            uint8_t *bkStart = head_ - sizeof(Detail::BookKeeping<void>);
             Detail::BookKeeping<void> *bk = static_cast<Detail::BookKeeping<void> *>((void *)bkStart);
             uint8_t *objStart = bkStart - bk->sizeBytes;
             // call destructor
             bk->destructor(objStart);
 
             // decrement head
-            head = objStart;
+            head_ = objStart;
         }
 
     private:
-        uint32_t maxSizeBytes = 0;
-        uint8_t* base = nullptr;
-        uint8_t* head = nullptr;
+        uint32_t maxSizeBytes_ = 0;
+        uint8_t* base_ = nullptr;
+        uint8_t* head_ = nullptr;
     };
 }
