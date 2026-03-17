@@ -1,8 +1,8 @@
 #include <gtest/gtest.h>
 #include "Scratch.hpp"
+#include "Utils.h"
 
 using namespace Jalloc;
-#define JALLOC_UNUSED(x) (void)(x)
 
 TEST(Scratch, AllocateSome)
 {

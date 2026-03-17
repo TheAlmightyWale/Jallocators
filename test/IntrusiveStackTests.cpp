@@ -1,9 +1,8 @@
 #include <gtest/gtest.h>
+#include "Utils.h"
 #include "IntrusiveStack.hpp"
 
 using namespace Jalloc;
-
-#define JALLOC_UNUSED(x) (void)(x)
 
 TEST(IntrusiveStack, CallConstructorOnAllocation)
 {
