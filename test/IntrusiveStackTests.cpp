@@ -57,7 +57,7 @@ TEST(IntrusiveStack, DeletesTop)
     JALLOC_UNUSED(stack.Alloc<int64_t>());
 
     stack.Delete();
-    EXPECT_EQ(stack.AvailableSpace(),180);
+    EXPECT_EQ(stack.AvailableSpace(), 228);
 }
 
 TEST(IntrusiveStack, ResetsAll)

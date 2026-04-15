@@ -2,7 +2,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <assert.h>
-#include <functional>
+#include "Utils.h"
 
 namespace Jalloc
 {
@@ -12,15 +12,15 @@ namespace Jalloc
         struct BookKeeping
         {
             uint16_t sizeBytes = sizeof(T);
-            std::function<void(void const *)> destructor = ([](void const *p)
-                                                            { static_cast<T const *>(p)->~T(); });
+            Destructor destructor = {this, // address of object
+                                [](const void* x) { static_cast<const T*>(x)->~T(); }};
         };
 
         template <>
         struct BookKeeping<void>
         {
             uint16_t sizeBytes;
-            std::function<void(void const *)> destructor;
+            Destructor destructor;
         };
     }
     // Fixed size Intrusive stack class. Can allocate and deallocate memory
@@ -85,7 +85,7 @@ namespace Jalloc
             Detail::BookKeeping<void> *bk = static_cast<Detail::BookKeeping<void> *>((void *)bkStart);
             uint8_t *objStart = bkStart - bk->sizeBytes;
             // call destructor
-            bk->destructor(objStart);
+            bk->destructor.destroy(bk->destructor.p);
 
             // decrement head
             head_ = objStart;

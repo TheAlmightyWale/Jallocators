@@ -16,7 +16,7 @@ TEST(Scratch, AllocateSome)
     void* data = alloc.Alloc<Data>();
     JALLOC_UNUSED(data);
 
-    EXPECT_EQ(alloc.AvailableSpace(), 180);
+    EXPECT_EQ(alloc.AvailableSpace(), 228);
 }
 
 TEST(Scratch, DeallocateAll)
@@ -30,7 +30,7 @@ TEST(Scratch, DeallocateAll)
 
     void* data = alloc.Alloc<Data>();
     JALLOC_UNUSED(data);
-    EXPECT_EQ(alloc.AvailableSpace(), 180);
+    EXPECT_EQ(alloc.AvailableSpace(), 228);
 
     alloc.Reset();
     EXPECT_EQ(alloc.AvailableSpace(), 256);
