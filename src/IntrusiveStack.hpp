@@ -38,6 +38,7 @@ namespace Jalloc
 
         ~IntrusiveStack()
         {
+            Reset();
             std::free(base_);
         }
 
